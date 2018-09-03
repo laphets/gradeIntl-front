@@ -3,29 +3,29 @@
         <div class="container">
             <header>
                 <div class="title">
-                    <h1>XXX同学成绩报告单</h1>
+                    <h1>{{name}}同学成绩报告单</h1>
                 </div>
             </header>
             <main>
-                <div v-for="i in 5" class="card-container">
+                <div v-for="(item, index) in gradeList" :key="index" class="card-container">
                     <div class="title">
-                        2017学年  大一下学期
+                        {{item.year}}学年  {{termMap(item.term)}}学期
                     </div>
                     <div class="body-container">
                         <div>
                             <div class="gpa">
-                                学期GPA: <span class="number">4</span>
+                                学期GPA: <span class="number">{{item.cur_gpa}}</span>
                             </div>
                             <div class="rank">
-                                排名: <span class="number">1</span>
+                                排名: <span class="number">{{item.rank}}</span>
                             </div>
                         </div>
                         <div>
                             <div class="gpa">
-                                学期GPA: <span class="number">4</span>
+                                统计GPA: <span class="number">{{item.total_gpa}}</span>
                             </div>
                             <div class="rank">
-                                排名: <span class="number">1</span>
+                                排名: <span class="number">{{item.rank}}</span>
                             </div>
                         </div>
                     </div>
@@ -47,9 +47,41 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import { getGrade } from '@/api/grade'
+import { Getter } from 'vuex-class'
 
 @Component
-export default class Home extends Vue {}
+export default class IndexPage extends Vue {
+    @Getter('ZJUid') ZJUid!: string;
+    @Getter('name') name!: string;
+
+    gradeList = []
+    async created() {
+        const { data } = await getGrade()
+        this.gradeList = data.data
+    }
+
+    termMap(code: number) {
+        switch (code) {
+            case 1:
+                return '大一上'
+            case 2:
+                return '大一下'
+            case 3:
+                return '大二上'
+            case 4:
+                return '大二下'
+            case 5:
+                return '大三上'
+            case 6:
+                return '大三下'
+            case 7:
+                return '大四上'
+            case 8:
+                return '大四下'
+        }
+    }
+}
 </script>
  
 <style lang="less" scoped>
@@ -131,6 +163,7 @@ export default class Home extends Vue {}
 .outer-container {
     background-color: #c9c9c9!important;
     margin: 0;
-    height: 100%;
+    height: 100vh;
+    overflow: auto;
 }
 </style>

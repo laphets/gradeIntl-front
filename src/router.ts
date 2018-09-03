@@ -6,6 +6,7 @@ import Upload from './views/upload.vue';
 Vue.use(Router);
 
 export default new Router({
+  mode: 'history',
   routes: [
     {
       path: '/',

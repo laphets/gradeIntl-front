@@ -2,12 +2,12 @@
     <div class="container">
         <div>
             <el-card class="box-card">
-                <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-                    <el-form-item label="学年">
-                        <el-input v-model="form.year"></el-input>
+                <el-form ref="form" :model="fileform" :rules="rules" label-width="80px">
+                    <el-form-item label="学年" prop="year">
+                        <el-input v-model.number="fileform.year" placeholder="例如: 2017"></el-input>
                     </el-form-item>
-                    <el-form-item label="学期">
-                        <el-select v-model="form.term" placeholder="请选择学期">
+                    <el-form-item label="学期" prop="term">
+                        <el-select v-model="fileform.term" placeholder="请选择学期">
                         <el-option label="大一上" value="1"></el-option>
                         <el-option label="大一下" value="2"></el-option>
                         <el-option label="大二上" value="3"></el-option>
@@ -21,11 +21,11 @@
                     <el-form-item label="Excel">
                         <input type="file" @change="addFile($event)">
                     </el-form-item>
-                    <el-form-item label="密钥">
-                        <el-input v-model="form.key"></el-input>
+                    <el-form-item label="密钥" prop="key">
+                        <el-input v-model="fileform.key"></el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="onSubmit">立即导入</el-button>
+                        <el-button type="primary" @click="onSubmit()">立即导入</el-button>
                         <el-button>取消</el-button>
                     </el-form-item>
                 </el-form>
@@ -36,20 +36,22 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import queryString from 'query-string'
+import axios from 'axios'
 
 @Component
 export default class UploadPage extends Vue {
-    form = {
+    fileform = {
         year: '',
         term: '',
         key: ''
     }
-    file = null
+    file = ''
 
     rules = {
         year: [
             { required: true, message: '请输入学年名称', trigger: 'blur' },
-            // { type: 'number', message: '必须为数字值'}
+            { type: 'number', message: '必须为数字值'}
         ],
         term: [
             { required: true, message: '请选择学期', trigger: 'blur' },
@@ -67,17 +69,48 @@ export default class UploadPage extends Vue {
                 message: '请上传以.xlsx格式结尾的excel文件',
                 type: 'warning'
             })
+            this.file = ''
             return
         }
         this.file = file
     }
 
     onSubmit() {
-        // console.log(this.$refs['form']);
-        (this.$refs['form'] as any).validate((valid: boolean) => {
+        // console.log((this.$refs['form'] as any).validate);
+        (this.$refs['form'] as any).validate(async (valid: boolean) => {
             console.log(valid);
             if (valid) {
-                // alert('submit!');
+                if (this.file) {
+                    const formData = new FormData()
+                    formData.append('file', this.file)
+                    const config = {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }
+                    const st = queryString.stringify(this.fileform)
+                    try {
+                        const { data } = await axios.post(`/api/v1/grade/excel?${st}`, formData, config)
+                        if (data.code !== 0) {
+                            throw data.data
+                        }
+                        this.$message({
+                            message: '上传成功~',
+                            type: 'success',
+                        })
+                    } catch (error) {
+                        this.$message({
+                            message: error,
+                            type: 'error'
+                        })
+                    }
+                } else {
+                    this.$message({
+                        message: '请选择有效的上传文件',
+                        type: 'warning'
+                    })
+                    return false
+                }
             } else {
                 console.log('error submit!!');
                 return false;

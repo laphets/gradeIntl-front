@@ -18,6 +18,14 @@
                         <el-option label="大四下" value="8"></el-option>
                         </el-select>
                     </el-form-item>
+                    <el-form-item label="专业" prop="subject">
+                        <el-select v-model="fileform.subject" placeholder="请选择专业">
+                        <el-option label="ECE" value="ECE"></el-option>
+                        <el-option label="EE" value="EE"></el-option>
+                        <el-option label="ME" value="ME"></el-option>
+                        <el-option label="CE" value="CE"></el-option>
+                        </el-select>
+                    </el-form-item>
                     <el-form-item label="Excel">
                         <input type="file" @change="addFile($event)">
                     </el-form-item>
@@ -44,7 +52,8 @@ export default class UploadPage extends Vue {
     fileform = {
         year: '',
         term: '',
-        key: ''
+        key: '',
+        subject: ''
     }
     file = ''
 
@@ -55,6 +64,9 @@ export default class UploadPage extends Vue {
         ],
         term: [
             { required: true, message: '请选择学期', trigger: 'blur' },
+        ],
+        subject: [
+            { required: true, message: '请选择专业', trigger: 'blur' },
         ],
         key: [
             { required: true, message: '请输入密钥', trigger: 'blur' },

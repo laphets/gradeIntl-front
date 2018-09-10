@@ -5,7 +5,7 @@ module.exports = {
     port: 80,
     proxy: {
       '/api': {
-        target: 'http://localhost:8290',
+        target: 'https://intl.zjuqsc.com/api',
         pathRewrite: {
           '^/api': '/'
         }

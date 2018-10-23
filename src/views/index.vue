@@ -65,8 +65,8 @@ export default class IndexPage extends Vue {
 
     gradeList = []
 
+
     GetPercent(num: number, total: number) {
-        // console.log(num, total, num/total)
         return total <= 0 ? '0%' : (Math.round(num / total * 100));
     } 
 
